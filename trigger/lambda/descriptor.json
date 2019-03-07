@@ -1,0 +1,34 @@
+{
+    "name": "flogo-lambda",
+    "type": "flogo:trigger",
+    "shim": "plugin",
+    "ref": "github.com/project-flogo/aws/trigger/lambda",
+    "version": "0.0.1",
+    "title": "Lambda Trigger",
+    "description": "AWS Lambda Trigger used to start a flow as a function.",
+    "homepage": "https://github.com/project-flogo/aws/trigger/lambda",
+    "settings": [
+    ],
+    "output": [
+      {
+        "name": "context",
+        "type": "object"
+      },
+      {
+        "name": "evt",
+        "type": "object"
+      }
+    ],
+    "reply": [
+      {
+        "name": "data",
+        "type": "any"
+      },
+      {
+        "name": "status",
+        "type": "integer",
+        "value": 200
+      }
+    ]
+  }
+  
