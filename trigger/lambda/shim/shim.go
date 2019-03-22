@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-lambda-go/lambdacontext"
-	fl "github.com/project-flogo/aws/trigger/lambda"
+	fl "github.com/project-flogo/aws-contrib/trigger/lambda"
 )
 
 const (
