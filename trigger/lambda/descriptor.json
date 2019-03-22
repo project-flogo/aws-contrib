@@ -5,7 +5,7 @@
     "version": "0.0.1",
     "title": "Lambda Trigger",
     "description": "AWS Lambda Trigger used to start a flow as a function.",
-    "homepage": "https://github.com/project-flogo/aws/trigger/lambda",
+    "homepage": "https://github.com/project-flogo/aws-contrib/trigger/lambda",
     "settings": [
     ],
     "output": [
