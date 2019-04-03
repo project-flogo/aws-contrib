@@ -1,0 +1,42 @@
+{
+  "name": "flogo-aws-iotshadow",
+  "type": "flogo:activity",
+  "version": "0.0.1",
+  "title": "AWS Device Shadow",
+  "description": "AWS Device Shadow",
+  "homepage": "https://github.com/project-flogo/aws-contrib/tree/master/activity/iotshadow",
+  "settings":[
+    {
+      "name": "thingName",
+      "type": "string",
+      "required": true,
+      "description" : "The name of the \"thing\" in Aws IoT **REQUIRED**"
+    },
+    {
+      "name": "op",
+      "type": "string",
+      "required": true,
+      "allowed" : ["get", "update", "delete"],
+      "description" : "The Aws IoT shadow operation to perform  (Allowed values are get, update, delete)"
+    }
+  ],
+  "input":[
+    {
+      "name": "desired",
+      "type": "object",
+      "description" : "The desired state of the thing"
+    },
+    {
+      "name": "reported",
+      "type": "object",
+      "description" : "The reported state of the thing"
+    }
+  ],
+  "output":[
+    {
+      "name": "result",
+      "type": "object",
+      "description" : "The response shadow document"
+    }
+  ]
+}
