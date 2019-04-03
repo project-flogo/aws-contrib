@@ -3,6 +3,7 @@ package iotshadow
 import (
 	"encoding/json"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/iotdataplane"
 	"github.com/project-flogo/core/activity"
@@ -18,8 +19,8 @@ func init() {
 // input    : {desired,reported}
 // output   : {result}
 type Activity struct {
-	settings  *Settings
-	dataPlane *iotdataplane.IoTDataPlane
+	settings *Settings
+	client   *iotdataplane.IoTDataPlane
 }
 
 var activityMd = activity.ToMetadata(&Settings{}, &Input{}, &Output{})
@@ -36,9 +37,13 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 		return nil, err
 	}
 
-	idp := iotdataplane.New(sess)
+	act := &Activity{settings: s}
 
-	act := &Activity{settings: s, dataPlane: idp}
+	if s.Region != "" {
+		act.client = iotdataplane.New(sess, aws.NewConfig().WithRegion(s.Region))
+	} else {
+		act.client = iotdataplane.New(sess)
+	}
 
 	return act, nil
 }
@@ -77,7 +82,7 @@ func (a *Activity) Eval(context activity.Context) (done bool, err error) {
 		sInput := &iotdataplane.UpdateThingShadowInput{}
 		sInput.SetThingName(a.settings.ThingName)
 		sInput.SetPayload(reqJSON)
-		out, err := a.dataPlane.UpdateThingShadow(sInput)
+		out, err := a.client.UpdateThingShadow(sInput)
 		if err != nil {
 			return false, err
 		}
@@ -85,7 +90,7 @@ func (a *Activity) Eval(context activity.Context) (done bool, err error) {
 	case "get":
 		sInput := &iotdataplane.GetThingShadowInput{}
 		sInput.SetThingName(a.settings.ThingName)
-		out, err := a.dataPlane.GetThingShadow(sInput)
+		out, err := a.client.GetThingShadow(sInput)
 		if err != nil {
 			return false, err
 		}
@@ -94,7 +99,7 @@ func (a *Activity) Eval(context activity.Context) (done bool, err error) {
 
 		sInput := &iotdataplane.DeleteThingShadowInput{}
 		sInput.SetThingName(a.settings.ThingName)
-		out, err := a.dataPlane.DeleteThingShadow(sInput)
+		out, err := a.client.DeleteThingShadow(sInput)
 		if err != nil {
 			return false, err
 		}
@@ -102,7 +107,6 @@ func (a *Activity) Eval(context activity.Context) (done bool, err error) {
 	}
 
 	out := &Output{}
-	//var result interface{}
 	err = json.Unmarshal(payload, &out.Result)
 	if err != nil {
 		return false, err

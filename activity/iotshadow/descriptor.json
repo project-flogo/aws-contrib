@@ -3,21 +3,26 @@
   "type": "flogo:activity",
   "version": "0.0.1",
   "title": "AWS Device Shadow",
-  "description": "AWS Device Shadow",
+  "description": "Interact with AWS Device Shadow Service",
   "homepage": "https://github.com/project-flogo/aws-contrib/tree/master/activity/iotshadow",
   "settings":[
     {
       "name": "thingName",
       "type": "string",
       "required": true,
-      "description" : "The name of the \"thing\" in Aws IoT **REQUIRED**"
+      "description" : "The name of the \"thing\" in AWS IoT"
     },
     {
       "name": "op",
       "type": "string",
       "required": true,
       "allowed" : ["get", "update", "delete"],
-      "description" : "The Aws IoT shadow operation to perform  (Allowed values are get, update, delete)"
+      "description" : "The AWS IoT shadow operation to perform  (Allowed values are get, update, delete)"
+    },
+    {
+      "name": "region",
+      "type": "string",
+      "description" : "The AWS region, used environment setting by default"
     }
   ],
   "input":[
