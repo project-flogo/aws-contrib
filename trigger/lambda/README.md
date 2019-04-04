@@ -48,7 +48,7 @@ flogo install github.com/project-flogo/aws-contrib/trigger/lambda
 | aws:cognito           | AWS Cognito
 | aws:config            | AWS Config
 | aws:dynamodb          | AWS Dynamodb
-| aws:kinesis           | AWS Kinesis,
+| aws:kinesis           | AWS Kinesis
 | aws:kinesis-analytics | AWS Kinesis Analytics
 | aws:kinesis-firehose  | AWS Kinesis Firehose
 | aws:s3                | AWS S3
