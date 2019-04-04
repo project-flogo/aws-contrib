@@ -79,7 +79,7 @@ func coerceResponse(details *fl.RequestDetails, result map[string]interface{}) (
 
 func main() {
 	syslog.Println("Starting AWS Lambda Trigger..")
-	lambda.Start(&LambdaHandler{})
+	lambda.StartHandler(&LambdaHandler{})
 }
 
 
