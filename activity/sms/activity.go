@@ -1,4 +1,4 @@
-package sns
+package sms
 
 import (
 	"fmt"
@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/project-flogo/core/activity"
-	"github.com/project-flogo/core/data/coerce"
 	"github.com/project-flogo/core/data/metadata"
 )
 
@@ -18,12 +17,15 @@ func init() {
 
 const (
 	ovMessageId = "messageId"
+
+	defaultMaxPrice = 0.01
 )
 
 // Activity is an activity that is used to invoke a lambda function
 type Activity struct {
 	settings *Settings
 	client   *sns.SNS
+	msgAttrs map[string]*sns.MessageAttributeValue
 }
 
 var activityMd = activity.ToMetadata(&Settings{}, &Input{}, &Output{})
@@ -48,11 +50,18 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 		if err != nil {
 			return nil, err
 		}
-
 		act.client = sns.New(sess, aws.NewConfig().WithRegion(region))
 	} else {
 		act.client = sns.New(sess)
 	}
+
+	maxPrice := defaultMaxPrice
+	if s.MaxPrice != 0.0 {
+		maxPrice = s.MaxPrice
+	}
+	maxPriceString := fmt.Sprintf("%0.5f", maxPrice)
+
+	act.msgAttrs = getMessageAttrs(s.SmsType, s.SenderID, maxPriceString)
 
 	return act, nil
 }
@@ -65,57 +74,22 @@ func (a *Activity) Metadata() *activity.Metadata {
 // Eval implements activity.Activity.Eval
 func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 
-	ctx.Logger().Debugf("Sending SNS Message To: %s", a.settings.TopicARN)
-
 	in := &Input{}
 	err = ctx.GetInputObject(in)
 	if err != nil {
 		return false, err
 	}
 
-	pInput := &sns.PublishInput{TopicArn: &a.settings.TopicARN}
+	ctx.Logger().Debugf("Sending SMS Message To: %s", in.To)
 
-	var msg string
-	if a.settings.Json {
-		pInput.SetMessageStructure("json")
-
-		switch t := in.Message.(type) {
-		case map[string]string:
-			if _, exists := t["default"]; !exists {
-				t["default"] = "default message"
-			}
-			msg, err = coerce.ToString(t)
-		case map[string]interface{}:
-			if _, exists := t["default"]; !exists {
-				t["default"] = "default message"
-			}
-			msg, err = coerce.ToString(t)
-		case string:
-			msg = fmt.Sprintf("{\"default\":\"%s\"", t)
-		default:
-			def, err := coerce.ToString(t)
-			if err != nil {
-				return false, err
-			}
-			msg = fmt.Sprintf("{\"default\":\"%s\"", def)
-		}
-	} else {
-		msg, err = coerce.ToString(in.Message)
-	}
-	if err != nil {
-		return false, err
-	}
-
-	pInput.SetMessage(msg)
-	if in.Subject != "" {
-		pInput.SetSubject(in.Subject)
+	pInput := &sns.PublishInput{
+		PhoneNumber:       aws.String(in.To),
+		Message:           aws.String(in.Message),
+		MessageAttributes: a.msgAttrs,
 	}
 
 	if ctx.Logger().TraceEnabled() {
-		if in.Subject != "" {
-			ctx.Logger().Tracef("Subject: '%s'", in.Subject)
-		}
-		ctx.Logger().Tracef("Message: '%s'", msg)
+		ctx.Logger().Tracef("Message: '%s'", in.Message)
 	}
 
 	pOutput, err := a.client.Publish(pInput)
@@ -132,9 +106,32 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 	return true, nil
 }
 
+func getMessageAttrs(smsType, senderID, maxPrice string) map[string]*sns.MessageAttributeValue {
+
+	messageAttrs := map[string]*sns.MessageAttributeValue{
+		"AWS.SNS.SMS.SMSType": {
+			DataType:    aws.String("String"),
+			StringValue: aws.String(smsType),
+		},
+		"AWS.SNS.SMS.MaxPrice": {
+			DataType:    aws.String("Number"),
+			StringValue: aws.String(maxPrice),
+		},
+	}
+
+	if senderID != "" {
+		messageAttrs["AWS.SNS.SMS.SenderID"] = &sns.MessageAttributeValue{
+			DataType:    aws.String("String"),
+			StringValue: aws.String(senderID),
+		}
+	}
+
+	return messageAttrs
+}
+
 func getRegion(regionSetting string) (string, error) {
 
-	var awsRegions = []string{"us-east-1", "us-east-2", "us-west-1", "us-west-2", "ap-northeast-1", "ap-northeast-2", "ap-northeast-3", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ca-central-1", "cn-north-1", "cn-northwest-1", "eu-central-1", "eu-north-1", "eu-west-1", "eu-west-2", "eu-west-2", "sa-east-1"}
+	var awsRegions = []string{"us-east-1", "us-west-2", "ap-northeast-1", "ap-southeast-1", "ap-southeast-2", "eu-west-1"}
 
 	region := strings.ToLower(regionSetting)
 	valid := false
