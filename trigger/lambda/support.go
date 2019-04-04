@@ -3,6 +3,7 @@ package lambda
 import (
 	"context"
 	"encoding/json"
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambdacontext"
 	"strings"
 )
@@ -223,4 +224,53 @@ type RequestDetails struct {
 	Payload   []byte
 	Event     map[string]interface{}
 	EventType EvtType
+}
+
+
+func GenerateResponse(details *RequestDetails, result map[string]interface{}) ([]byte, error) {
+
+	responseData := result["data"]
+	statusCode := result["status"].(int)
+
+	var responseRaw []byte
+
+	if val, ok := responseData.(string); ok {
+		responseRaw = []byte(val)
+	} else {
+		var err error
+		responseRaw, err = json.Marshal(responseData)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var resultBytes []byte
+
+	// Check if API GW request. If so, build the correct response
+	switch details.EventType {
+	case EtAwsApiGw:
+		resp := events.APIGatewayProxyResponse{
+			StatusCode: func() int {
+				if statusCode == 0 {
+					return 200
+				} else {
+					return statusCode
+				}
+			}(),
+			Body: func() string {
+				return string(responseRaw)
+			}(),
+			IsBase64Encoded: false,
+		}
+		var err error
+		resultBytes, err = json.Marshal(resp)
+		if err != nil {
+			return nil, err
+		}
+
+	default:
+		resultBytes = responseRaw
+	}
+
+	return resultBytes, nil
 }
