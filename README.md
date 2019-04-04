@@ -11,7 +11,7 @@ A collection of AWS related Flogo contributions.  This repository consists of ac
 * [lambda](activity/lambda): Invoke Lamdba function
 
 ### Triggers
-* [lambda](trigger/lambda): Listen to internal engine messages
+* [lambda](trigger/lambda): Trigger to run Flogo as AWS Lambda function
 
 
 
