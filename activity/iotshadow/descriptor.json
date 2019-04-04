@@ -22,7 +22,7 @@
     {
       "name": "region",
       "type": "string",
-      "description" : "The AWS region, used environment setting by default"
+      "description" : "The AWS region, uses environment setting by default"
     }
   ],
   "input":[

@@ -9,6 +9,7 @@ A collection of AWS related Flogo contributions.  This repository consists of ac
 ### Activities
 * [iotshadow](activity/iotshadow): Use IoT Shadow Service
 * [lambda](activity/lambda): Invoke Lamdba function
+* [sns](activity/sns): Send message via SNS
 
 ### Triggers
 * [lambda](trigger/lambda): Trigger to run Flogo as AWS Lambda function

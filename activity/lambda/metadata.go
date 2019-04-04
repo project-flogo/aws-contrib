@@ -9,7 +9,7 @@ type Settings struct {
 	ClientContext map[string]interface{} `md:"clientContext"`     // Information about the client to pass to the function via the context
 	Async         bool                   `md:"async"`             // Perform async invocation
 	ExecutionLog  bool                   `md:"executionLog"`      // Include the execution log in the response
-	Region        string                 `md:"region"`            // The AWS region, used environment setting by default
+	Region        string                 `md:"region"`            // The AWS region, uses environment setting by default
 }
 
 type Input struct {

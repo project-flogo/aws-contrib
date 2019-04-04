@@ -1,4 +1,4 @@
-module github.com/project-flogo/aws-contrib/activity/iotshadow
+module github.com/project-flogo/aws-contrib/activity/sns
 
 require (
 	github.com/aws/aws-sdk-go v1.19.9

@@ -1,4 +1,4 @@
-package lambda
+package sns
 
 import (
 	"testing"
@@ -14,3 +14,4 @@ func TestRegister(t *testing.T) {
 
 	assert.NotNil(t, act)
 }
+
