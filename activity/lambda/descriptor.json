@@ -1,0 +1,55 @@
+{
+  "name": "flogo-aws-lambda",
+  "type": "flogo:activity",
+  "version": "0.0.1",
+  "title": "Invoke AWS Lambda Function",
+  "description": "Invoke AWS Lambda Function",
+  "homepage": "https://github.com/project-flogo/aws-contrib/tree/master/activity/lambda",
+  "settings":[
+    {
+      "name": "function",
+      "type": "string",
+      "required": true,
+      "description" : "The name or ARN of the Lambda function"
+    },
+    {
+      "name": "clientContext",
+      "type": "object",
+      "description" : "Information about the client to pass to the function via the context"
+    },
+    {
+      "name": "async",
+      "type": "bool",
+      "description" : "Perform async invocation"
+    },
+    {
+      "name": "executionLog",
+      "type": "bool",
+      "description" : "Include the execution log in the response"
+    },
+    {
+      "name": "region",
+      "type": "string",
+      "description" : "The AWS region, used environment setting by default"
+    }
+  ],
+  "input":[
+    {
+      "name": "payload",
+      "type": "object",
+      "description": "The payload object"
+    }
+  ],
+  "output": [
+    {
+      "name": "result",
+      "type": "object",
+      "description": "The response from the function"
+    },
+    {
+      "name": "status",
+      "type": "int",
+      "description": "The HTTP status code"
+    }
+  ]
+}
