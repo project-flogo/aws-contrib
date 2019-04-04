@@ -80,7 +80,7 @@ func ToEventType(str string) EvtType {
 	return EtUnknown
 }
 
-func FromoEventType(et EvtType) string {
+func FromEventType(et EvtType) string {
 	if et, exists := fromEventType[et]; exists {
 		return et
 	}

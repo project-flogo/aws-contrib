@@ -89,7 +89,7 @@ func Invoke(details *RequestDetails) (map[string]interface{}, error) {
 	//todo figure out how to support flogo logging in Lambda
 	//log.RootLogger().Debugf("Received ctx: '%+v'\n", lambdaCtx)
 
-	evtTypeStr := FromoEventType(details.EventType)
+	evtTypeStr := FromEventType(details.EventType)
 
 	syslog.Printf("Payload Type: %s\n", evtTypeStr)
 	syslog.Printf("Payload: '%+v'\n", details.Event)
