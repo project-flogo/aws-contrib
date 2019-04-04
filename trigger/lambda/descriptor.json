@@ -1,33 +1,48 @@
 {
-    "name": "flogo-lambda",
-    "type": "flogo:trigger",
-    "shim": "plugin",
-    "version": "0.0.1",
-    "title": "Lambda Trigger",
-    "description": "AWS Lambda Trigger used to start a flow as a function.",
-    "homepage": "https://github.com/project-flogo/aws-contrib/trigger/lambda",
+  "name": "flogo-aws-lambda",
+  "type": "flogo:trigger",
+  "shim": "plugin",
+  "version": "0.0.1",
+  "title": "AWS Lambda Trigger",
+  "description": "AWS Lambda Trigger",
+  "homepage": "https://github.com/project-flogo/aws-contrib/tree/master/trigger/lambda",
+  "handler": {
     "settings": [
-    ],
-    "output": [
       {
-        "name": "context",
-        "type": "object"
-      },
-      {
-        "name": "evt",
-        "type": "object"
-      }
-    ],
-    "reply": [
-      {
-        "name": "data",
-        "type": "any"
-      },
-      {
-        "name": "status",
-        "type": "integer",
-        "value": 200
+        "name": "eventType",
+        "type": "string",
+        "description": "The type of event to handle, (e.g. aws:s3, aws:sns)"
       }
     ]
-  }
+  },
+  "output": [
+    {
+      "name": "context",
+      "type": "object",
+      "description": "The lambda context information"
+    },
+    {
+      "name": "event",
+      "type": "object",
+      "description": "The event data"
+    },
+    {
+      "name": "eventType",
+      "type": "string",
+      "description": "The event type, (e.g. aws:s3, aws:sns)"
+    }
+  ],
+  "reply": [
+    {
+      "name": "data",
+      "type": "any",
+      "description": "The data to reply with"
+    },
+    {
+      "name": "status",
+      "type": "int",
+      "description": "The status code to reply with"
+    }
+  ]
+}
   

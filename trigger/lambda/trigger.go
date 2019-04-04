@@ -3,22 +3,18 @@ package lambda
 import (
 	"context"
 	"encoding/json"
-	"flag"
 	syslog "log"
 
+	"github.com/project-flogo/core/data/metadata"
 	"github.com/project-flogo/core/support/log"
-
 	"github.com/project-flogo/core/trigger"
-
-	// Import the aws-lambda-go. Required for dep to pull on app create
-	_ "github.com/aws/aws-lambda-go/lambda"
 )
 
-var triggerMd = trigger.NewMetadata(&Output{}, &Reply{})
+var triggerMd = trigger.NewMetadata(&HandlerSettings{}, &Output{}, &Reply{})
 var singleton *LambdaTrigger
 
 func init() {
-	trigger.Register(&LambdaTrigger{}, &LambdaFactory{})
+	_ = trigger.Register(&LambdaTrigger{}, &LambdaFactory{})
 }
 
 // LambdaFactory AWS Lambda Trigger factory
@@ -27,9 +23,15 @@ type LambdaFactory struct {
 
 //New Creates a new trigger instance for a given id
 func (t *LambdaFactory) New(config *trigger.Config) (trigger.Trigger, error) {
-	singleton = &LambdaTrigger{}
-	return singleton, nil
 
+	if singleton == nil {
+		singleton = &LambdaTrigger{}
+		return singleton, nil
+	}
+
+	log.RootLogger().Warn("Only one lambda trigger instance can be instantiated")
+
+	return nil, nil
 }
 
 // Metadata implements trigger.Trigger.Metadata
@@ -39,69 +41,93 @@ func (t *LambdaFactory) Metadata() *trigger.Metadata {
 
 // LambdaTrigger AWS Lambda trigger struct
 type LambdaTrigger struct {
-	id       string
-	log      log.Logger
-	handlers []trigger.Handler
+	id             string
+	log            log.Logger
+	handlers       map[string]trigger.Handler
+	defaultHandler trigger.Handler
 }
 
 func (t *LambdaTrigger) Initialize(ctx trigger.InitContext) error {
 	t.id = "Lambda"
 	t.log = ctx.Logger()
-	t.handlers = ctx.GetHandlers()
+	t.defaultHandler = ctx.GetHandlers()[0]
+	t.handlers = make(map[string]trigger.Handler)
+
+	for _, handler := range ctx.GetHandlers() {
+
+		s := &HandlerSettings{}
+		err := metadata.MapToStruct(handler.Settings(), s, true)
+		if err != nil {
+			return err
+		}
+
+		if s.EventType == "" {
+			if t.defaultHandler == nil {
+				t.defaultHandler = handler
+			} else {
+				log.RootLogger().Warn("Only one default handler will be used")
+			}
+			continue
+		}
+
+		if _, exists := t.handlers[s.EventType]; exists {
+			log.RootLogger().Warnf("Only first handler for eventType '%s' will be used", s.EventType)
+			break
+		}
+
+		t.handlers[s.EventType] = handler
+	}
+
 	return nil
 }
 
 // Invoke starts the trigger and invokes the action registered in the handler
-func Invoke() (map[string]interface{}, error) {
+func Invoke(details *RequestDetails) (map[string]interface{}, error) {
 
-	log.RootLogger().Info("Starting AWS Lambda Trigger")
-	syslog.Println("Starting AWS Lambda Trigger..")
+	syslog.Printf("Received request: %s\n", details.CtxInfo["awsRequestId"])
 
-	// Parse the flags
-	flag.Parse()
+	//todo figure out how to support flogo logging in Lambda
+	//log.RootLogger().Debugf("Received ctx: '%+v'\n", lambdaCtx)
 
-	// Looking up the arguments
-	evtArg := flag.Lookup("evt")
-	var evt Event
-	// Unmarshall evt
-	if err := json.Unmarshal([]byte(evtArg.Value.String()), &evt); err != nil {
-		return nil, err
-	}
+	evtTypeStr := FromoEventType(details.EventType)
 
-	log.RootLogger().Debugf("Received evt: '%+v'\n", evt)
-	syslog.Printf("Received evt: '%+v'\n", evt)
-
-	// Get the context
-	ctxArg := flag.Lookup("ctx")
-	var lambdaCtx interface{}
-
-	// Unmarshal ctx
-	if err := json.Unmarshal([]byte(ctxArg.Value.String()), &lambdaCtx); err != nil {
-		return nil, err
-	}
-
-	log.RootLogger().Debugf("Received ctx: '%+v'\n", lambdaCtx)
-	syslog.Printf("Received ctx: '%+v'\n", lambdaCtx)
-	syslog.Printf("Singleton '%+v' \n", singleton)
-	log.RootLogger().Info("handlers ", singleton.handlers[0])
-	//select handler, use 0th for now
-	handler := singleton.handlers[0]
+	syslog.Printf("Payload Type: %s\n", evtTypeStr)
+	syslog.Printf("Payload: '%+v'\n", details.Event)
 
 	out := &Output{}
+	out.Context = details.CtxInfo
+	out.Event = details.Event
 
-	out.Context = lambdaCtx
-	out.Event = evt
+	if details.EventType == EtFlogoOnDemand {
 
+		// todo add event type to flogo events?
+		var evt FlogoEvent
+		if err := json.Unmarshal(details.Payload, &evt); err != nil {
+			return nil, err
+		}
+
+		out.Event = map[string]interface{}{"payload":evt.Payload, "flogo":evt.Flogo}
+	}
+
+	out.EventType = evtTypeStr
+
+	//select handler for the specified eventType
+	handler := singleton.handlers[evtTypeStr]
+	if handler == nil {
+		handler = singleton.defaultHandler
+	}
 	results, err := handler.Handle(context.Background(), out)
-
 	if err != nil {
 		log.RootLogger().Debugf("Lambda Trigger Error: %s", err.Error())
+		syslog.Printf("Lambda Trigger Error: %s", err.Error())
 		return nil, err
 	}
 
 	reply := Reply{}
-
-	reply.FromMap(results)
+	err = reply.FromMap(results)
+	if err != nil {
+		return nil, err
+	}
 
 	if reply.Data != nil {
 		if reply.Status == 0 {
@@ -121,7 +147,7 @@ func (t *LambdaTrigger) Stop() error {
 	return nil
 }
 
-type Event struct {
+type FlogoEvent struct {
 	Payload interface{}     `json:"payload"`
 	Flogo   json.RawMessage `json:"flogo"`
 }
