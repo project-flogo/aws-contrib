@@ -1,0 +1,56 @@
+{
+  "name": "flogo-aws-sms",
+  "type": "flogo:activity",
+  "version": "0.0.1",
+  "title": "Send SMS via AWS SNS",
+  "description": "Send SMS message via AWS SNS",
+  "homepage": "https://github.com/project-flogo/aws-contrib/tree/master/activity/sms",
+  "settings":[
+    {
+      "name": "region",
+      "type": "string",
+      "required": "true",
+      "allowed" : ["us-east-1","us-west-2","ap-northeast-1","ap-southeast-1","ap-southeast-2", "eu-west-1"],
+      "description": "The AWS region to use (note: SMS is not supported in all AWS regions)"
+    },
+    {
+      "name": "smsType",
+      "type": "string",
+      "allowed" : ["Promotional", "Transactional"],
+      "value": "Promotional",
+      "description": "The type of SMS to send, defaults to Promotional"
+    },
+    {
+      "name": "senderID",
+      "type": "string",
+      "description": "The Sender ID for the SMS (note: not supported in all countries)"
+    },
+    {
+      "name": "maxPrice",
+      "type": "float64",
+      "description": "The maximum amount in USD that you are willing to spend to send a message",
+      "value": 0.01
+    }
+  ],
+  "input":[
+    {
+      "name": "to",
+      "type": "string",
+      "required": "true",
+      "description": "The phone number to which to send the SMS (e.g. +15555550100 )"
+    },
+    {
+      "name": "message",
+      "type": "string",
+      "required": "true",
+      "description": "The message to send"
+    }
+  ],
+  "output": [
+    {
+      "name": "messageId",
+      "type": "string",
+      "description": "The message id"
+    }
+  ]
+}

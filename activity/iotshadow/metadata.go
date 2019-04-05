@@ -7,7 +7,7 @@ import (
 type Settings struct {
 	ThingName string `md:"thingName,required"`                      // The name of the "thing" in AWS IoT
 	Op        string `md:"op,required,allowed(get,update,delete)"`  // The AWS IoT shadow operation to perform
-	Region    string `md:"region"`                                  // The AWS region, used environment setting by default
+	Region    string `md:"region"`                                  // The AWS region, uses environment setting by default
 }
 
 type Input struct {

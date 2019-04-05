@@ -8,15 +8,15 @@ This activity allows you to update/get/delete a device shadow on AWS.
 ```bash
 flogo install github.com/project-flogo/aws-contrib/activity/iotshadow
 ```
-
 ## Configuration
+To configure AWS credentials see [configuring-sdk](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html)
 
 ### Settings:
 | Name       | Type   | Description
 |:---        | :---   | :---     
 | thingName  | string | The name of the "thing" in AWS IoT **REQUIRED**
 | op         | string | The AWS IoT shadow operation to perform  (Allowed values are get, update, delete) - **REQUIRED**
-| region     | string | The AWS region, used environment setting by default
+| region     | string | The AWS region, uses environment setting by default
 
 ### Input:
 | Name     | Type   | Description
@@ -50,5 +50,3 @@ Configure a task in flow to update the device shadow of 'raspberry-pi' with a re
   }
 }
 ```
-
-To configure AWS credentials see [configuring-sdk](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html)

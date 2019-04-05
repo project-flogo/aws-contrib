@@ -1,4 +1,4 @@
-module github.com/project-flogo/aws-contrib/activity/lambda
+module github.com/project-flogo/aws-contrib/activity/sms
 
 require (
 	github.com/aws/aws-sdk-go v1.19.9

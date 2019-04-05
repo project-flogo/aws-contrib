@@ -6,15 +6,17 @@ This activity allows you to invoke an AWS Lambda function.
 ```bash
 flogo install github.com/project-flogo/aws-contrib/activity/lambda
 ```
+## Configuration
+To configure AWS credentials see [configuring-sdk](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html)
 
 ### Settings:
 | Name          | Type   | Description
 |:---           | :---   | :---     
-| function      | string | The name or ARN of the Lambda function **REQUIRED**
+| function      | string | The name or ARN of the Lambda function - **REQUIRED**
 | clientContext | object | Information about the client to pass to the function via the context
 | async         | bool   | Perform async invocation
 | executionLog  | bool   | Include the execution log in the response
-| region        | string | The AWS region, used environment setting by default
+| region        | string | The AWS region, uses environment setting by default
 
 ### Input:
 | Name     | Type   | Description
@@ -30,5 +32,3 @@ flogo install github.com/project-flogo/aws-contrib/activity/lambda
 
 ## Examples
 Coming soon...
-
-To configure AWS credentials see [configuring-sdk](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html)

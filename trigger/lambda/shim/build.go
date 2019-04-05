@@ -15,14 +15,13 @@ import (
 func main() {
 	fmt.Println("Running build script for the Lambda trigger")
 
-	var cmd = exec.Command("")
-
 	//Get the dir where build.go is present
 	appDir, err := os.Getwd()
-
 	if err != nil {
 		fmt.Printf(err.Error())
 	}
+
+	var cmd *exec.Cmd
 
 	// Clean up
 	fmt.Println("Cleaning up previous executables")
@@ -35,7 +34,7 @@ func main() {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		fmt.Printf(err.Error())
 	}

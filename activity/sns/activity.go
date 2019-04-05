@@ -1,26 +1,29 @@
-package lambda
+package sns
 
 import (
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
+	"strings"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/lambda"
+	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/project-flogo/core/activity"
+	"github.com/project-flogo/core/data/coerce"
 	"github.com/project-flogo/core/data/metadata"
-	"strings"
 )
 
 func init() {
 	_ = activity.Register(&Activity{}, New)
 }
 
+const (
+	ovMessageId = "messageId"
+)
+
 // Activity is an activity that is used to invoke a lambda function
 type Activity struct {
-	settings      *Settings
-	client        *lambda.Lambda
-	clientContext string
+	settings *Settings
+	client   *sns.SNS
 }
 
 var activityMd = activity.ToMetadata(&Settings{}, &Input{}, &Output{})
@@ -46,20 +49,9 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 			return nil, err
 		}
 
-		act.client = lambda.New(sess, aws.NewConfig().WithRegion(region))
+		act.client = sns.New(sess, aws.NewConfig().WithRegion(region))
 	} else {
-		act.client = lambda.New(sess)
-	}
-
-	if s.ClientContext != nil {
-		var b []byte
-		b, err := json.Marshal(&s.ClientContext)
-		if err != nil {
-			return nil, err
-		}
-
-		base64.StdEncoding.EncodeToString(b)
-		act.clientContext = string(b)
+		act.client = sns.New(sess)
 	}
 
 	return act, nil
@@ -73,54 +65,69 @@ func (a *Activity) Metadata() *activity.Metadata {
 // Eval implements activity.Activity.Eval
 func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 
+	ctx.Logger().Debugf("Sending SNS Message To: %s", a.settings.TopicARN)
+
 	in := &Input{}
 	err = ctx.GetInputObject(in)
 	if err != nil {
 		return false, err
 	}
 
-	iInput := &lambda.InvokeInput{FunctionName: &a.settings.Function}
+	pInput := &sns.PublishInput{TopicArn: &a.settings.TopicARN}
 
-	if a.clientContext != "" {
-		iInput.SetClientContext(a.clientContext)
-	}
+	var msg string
+	if a.settings.Json {
+		pInput.SetMessageStructure("json")
 
-	if a.settings.Async {
-		iInput.SetInvocationType(lambda.InvocationTypeEvent)
-	}
-
-	if a.settings.ExecutionLog {
-		iInput.SetLogType(lambda.LogTypeTail)
-	}
-
-	if in.Payload != nil {
-		b, err := json.Marshal(&in.Payload)
-		if err != nil {
-			return false, err
+		switch t := in.Message.(type) {
+		case map[string]string:
+			if _, exists := t["default"]; !exists {
+				t["default"] = "default message"
+			}
+			msg, err = coerce.ToString(t)
+		case map[string]interface{}:
+			if _, exists := t["default"]; !exists {
+				t["default"] = "default message"
+			}
+			msg, err = coerce.ToString(t)
+		case string:
+			msg = fmt.Sprintf("{\"default\":\"%s\"", t)
+		default:
+			def, err := coerce.ToString(t)
+			if err != nil {
+				return false, err
+			}
+			msg = fmt.Sprintf("{\"default\":\"%s\"", def)
 		}
-		iInput.SetPayload(b)
+	} else {
+		msg, err = coerce.ToString(in.Message)
 	}
-
-	iOutput, err := a.client.Invoke(iInput)
-	if err != nil {
-		ctx.Logger().Tracef("Lambda invoke error: %v", err)
-		return false, err
-	}
-	ctx.Logger().Tracef("Lambda response: %s", string(iOutput.Payload))
-
-	out := &Output{}
-
-	err = json.Unmarshal(iOutput.Payload, &out.Result)
 	if err != nil {
 		return false, err
 	}
 
-	out.Status = int(*iOutput.StatusCode)
+	pInput.SetMessage(msg)
+	if in.Subject != "" {
+		pInput.SetSubject(in.Subject)
+	}
 
-	err = ctx.SetOutputObject(out)
+	if ctx.Logger().TraceEnabled() {
+		if in.Subject != "" {
+			ctx.Logger().Tracef("Subject: '%s'", in.Subject)
+		}
+		ctx.Logger().Tracef("Message: '%s'", msg)
+	}
+
+	pOutput, err := a.client.Publish(pInput)
 	if err != nil {
 		return false, err
 	}
+
+	err = ctx.SetOutput(ovMessageId, *pOutput.MessageId)
+	if err != nil {
+		return false, err
+	}
+	ctx.Logger().Debugf("Message sent: %s", *pOutput.MessageId)
 
 	return true, nil
 }
