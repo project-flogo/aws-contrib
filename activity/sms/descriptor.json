@@ -1,7 +1,7 @@
 {
   "name": "flogo-aws-sms",
   "type": "flogo:activity",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "title": "Send SMS via AWS SNS",
   "description": "Send SMS message via AWS SNS",
   "homepage": "https://github.com/project-flogo/aws-contrib/tree/master/activity/sms",

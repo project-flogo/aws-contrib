@@ -1,6 +1,9 @@
-
-# Amazon SNS
-This activity allows you to send messages using Amazon SNS.
+<!--
+title: AWS SNS
+weight: 4605
+-->
+# AWS SNS
+This activity allows you to send messages using AWS SNS.
 
 ## Installation
 

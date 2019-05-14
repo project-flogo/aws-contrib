@@ -1,6 +1,9 @@
-
-# Amazon SNS-SMS
-This activity allows you to send SMS messages using Amazon SNS.
+<!--
+title: AWS SNS-SMS
+weight: 4605
+-->
+# AWS SNS-SMS
+This activity allows you to send SMS messages using AWS SNS.
 
 ## Installation
 
