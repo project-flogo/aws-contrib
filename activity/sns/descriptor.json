@@ -1,7 +1,7 @@
 {
   "name": "flogo-aws-sns",
   "type": "flogo:activity",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "title": "Send AWS SNS",
   "description": "Send message via AWS SNS",
   "homepage": "https://github.com/project-flogo/aws-contrib/tree/master/activity/sns",

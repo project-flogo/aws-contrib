@@ -2,7 +2,7 @@
   "name": "flogo-aws-lambda",
   "type": "flogo:trigger",
   "shim": "plugin",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "title": "AWS Lambda Trigger",
   "description": "AWS Lambda Trigger",
   "homepage": "https://github.com/project-flogo/aws-contrib/tree/master/trigger/lambda",

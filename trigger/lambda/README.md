@@ -1,5 +1,8 @@
-
-# AWS Lambda
+<!--
+title: AWS Lambda Trigger
+weight: 4605
+-->
+#AWS Lambda Trigger
 
 The Lambda trigger provides your Flogo application the ability to start actions running as an AWS Lambda function. 
 

@@ -1,4 +1,7 @@
-
+<!--
+title: AWS Device Shadow
+weight: 4605
+-->
 # AWS Device Shadow
 This activity allows you to update/get/delete a device shadow on AWS.
 

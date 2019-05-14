@@ -1,7 +1,7 @@
 {
   "name": "flogo-aws-lambda",
   "type": "flogo:activity",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "title": "Invoke AWS Lambda Function",
   "description": "Invoke AWS Lambda Function",
   "homepage": "https://github.com/project-flogo/aws-contrib/tree/master/activity/lambda",

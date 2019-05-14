@@ -1,4 +1,8 @@
-# Trigger Lambda function
+<!--
+title: AWS Lambda Invoke
+weight: 4605
+-->
+# AWS Lambda Invoke
 This activity allows you to invoke an AWS Lambda function.
 
 ## Installation

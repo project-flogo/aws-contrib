@@ -1,7 +1,7 @@
 {
   "name": "flogo-aws-iotshadow",
   "type": "flogo:activity",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "title": "AWS Device Shadow",
   "description": "Interact with AWS Device Shadow Service",
   "homepage": "https://github.com/project-flogo/aws-contrib/tree/master/activity/iotshadow",
