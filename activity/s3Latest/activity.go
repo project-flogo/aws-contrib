@@ -32,7 +32,7 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 		return nil, err
 	}
 
-	ctx.Logger().Debugf("Setting: %s, %s", s.ReplaceFile, s.UnZip)
+	// ctx.Logger().Debugf("Setting: %s, %s", s.ReplaceFile, s.UnZip)
 	// fmt.Println(s)
 	act := &Activity{settings: s} //add aSetting to instance
 
