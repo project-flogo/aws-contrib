@@ -1,4 +1,4 @@
-# AWS SNS
+# AWS s3Latest
 This activity allows you to check if an s3 file is newer than a local file and if so pull it down.  The activity returns the name of the file that is newest (whether it is the original local file or the downloaded file).
 
 ## Installation
