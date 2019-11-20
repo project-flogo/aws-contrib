@@ -1,0 +1,93 @@
+{
+    "name": "flogo-aws-s3",
+    "type": "flogo:activity",
+    "version": "0.1.0",
+    "title": "Amazon S3",
+    "description": "Upload or Download files from Amazon Simple Storage Service (S3)",
+    "homepage": "https://github.com/project-flogo/aws-contrib/tree/master/activity/s3",
+    "settings": [
+        {
+            "name": "awsAccessKeyID",
+            "type": "string",
+            "required": "false",
+            "description": "Your AWS Access Key (only needed if you don't give your Lambda function rights to invoke S3 reads and puts)"
+        },
+        {
+            "name": "awsSecretAccessKey",
+            "type": "string",
+            "required": "false",
+            "description": "Your AWS Secret Key (only needed if you don't give your Lambda function rights to invoke S3 reads and puts)"
+        },
+        {
+            "name": "awsRegion",
+            "type": "string",
+            "allowed": [
+                "us-east-1",
+                "us-east-2",
+                "us-west-1",
+                "us-west-2",
+                "ap-northeast-1",
+                "ap-northeast-2",
+                "ap-northeast-3",
+                "ap-south-1",
+                "ap-southeast-1",
+                "ap-southeast-2",
+                "ca-central-1",
+                "cn-north-1",
+                "cn-northwest-1",
+                "eu-central-1",
+                "eu-north-1",
+                "eu-west-1",
+                "eu-west-2",
+                "eu-west-2",
+                "sa-east-1"
+            ],
+            "description": "The AWS region, uses environment setting by default"
+        }
+    ]
+    "input": [
+        {
+            "name": "action",
+            "type": "string",
+            "allowed": [
+                "download",
+                "upload",
+                "delete",
+                "copy"
+            ],
+            "required": "true",
+            "description": "The action you want to perform"
+        },
+        {
+            "name": "s3BucketName",
+            "type": "string",
+            "required": "true",
+            "description": "The message subject"
+        },
+        {
+            "name": "s3Location",
+            "type": "string",
+            "required": "true",
+            "description": "The file location on S3, this should be a full path (like /bla/temp.txt)"
+        },
+        {
+            "name": "localLocation",
+            "type": "string",
+            "required": "false",
+            "description": "The localLocation is the full path to a file (like /bla/temp.txt) when uploading a file or the full path to a directory (like ./tmp) when downloading a file"
+        },
+        {
+            "name": "s3NewLocation",
+            "type": "string",
+            "required": "false",
+            "description": "The new file location on S3 of you want to copy a file, this should be a full path (like /bla/temp.txt)"
+        }
+    ],
+    "output": [
+        {
+            "name": "result",
+            "type": "string",
+            "description": "The result will contain OK if the action was carried out successfully or will contain an error message"
+        }
+    ]
+}
