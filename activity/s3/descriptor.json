@@ -44,7 +44,7 @@
             ],
             "description": "The AWS region, uses environment setting by default"
         }
-    ]
+    ],
     "input": [
         {
             "name": "action",
