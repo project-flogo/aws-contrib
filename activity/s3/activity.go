@@ -5,13 +5,17 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
+	"errors"
+	
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/project-flogo/core/activity"
 	"github.com/project-flogo/core/data/metadata"
+	"github.com/project-flogo/core/support/log"
 )
 
 func init() {
@@ -27,7 +31,8 @@ type Activity struct {
 	awsSession *session.Session
 }
 
-var activityMd = activity.ToMetadata(&Input{}, &Output{})
+var activityMd = activity.ToMetadata(&Settings{}, &Input{}, &Output{})
+var logger log.Logger
 
 func New(ctx activity.InitContext) (activity.Activity, error) {
 	s := &Settings{}
@@ -45,6 +50,7 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 		}
 		act.awsSession = session.Must(session.NewSession(&aws.Config{
 			Region: aws.String(region),
+			Credentials: credentials.NewEnvCredentials(),
 		}))
 	} else {
 		act.awsSession = session.Must(session.NewSession(&aws.Config{}))
@@ -64,6 +70,8 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 		return false, err
 	}
 
+	logger = ctx.Logger()
+
 	var s3err error
 	switch in.Action {
 	case "download":
@@ -74,6 +82,8 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 		s3err = deleteFileFromS3(a.awsSession, in.S3Location, in.S3BucketName)
 	case "copy":
 		s3err = copyFileOnS3(a.awsSession, in.S3Location, in.S3BucketName, in.S3NewLocation)
+	case "":
+		s3err = errors.New("Action not specified.")	
 	}
 	if s3err != nil {
 		// Set the output value in the context
@@ -154,6 +164,11 @@ func uploadFileToS3(awsSession *session.Session, localFile string, s3Location st
 	// Upload the file
 	_, err = s3Uploader.Upload(uploadInput)
 	if err != nil {
+		if reqerr, ok := err.(awserr.RequestFailure); ok {
+			logger.Debug("Request failed", reqerr.Code(), reqerr.Message(), reqerr.RequestID())
+		} else {
+			logger.Debug("Error:", err.Error())
+		}
 		return err
 	}
 
