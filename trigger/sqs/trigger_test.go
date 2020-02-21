@@ -23,7 +23,7 @@ const testConfig string = `{
 				"id":"dummy"
 			},
 			"settings": {
-				"queueUrl": "https://sqs.us-east-1.amazonaws.com/011182393636/sample",
+				"queueUrl": "",
 				"waitTime": 5.0
 
 				
