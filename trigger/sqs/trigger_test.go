@@ -3,6 +3,7 @@ package sqs
 import (
 	"encoding/json"
 	"testing"
+	"sync"
 
 	"github.com/project-flogo/core/action"
 	"github.com/project-flogo/core/support/test"
@@ -22,7 +23,9 @@ const testConfig string = `{
 				"id":"dummy"
 			},
 			"settings": {
-				"queue": ""
+				"queueUrl": "https://sqs.us-east-1.amazonaws.com/011182393636/sample",
+				"waitTime": 5.0
+
 				
 			}
 	  }
@@ -30,8 +33,9 @@ const testConfig string = `{
 	
   }`
 
-func TestKafkaTrigger_Initialize(t *testing.T) {
+func TestSQS_Trigger(t *testing.T) {
 	f := &Factory{}
+	var wg sync.WaitGroup
 
 	config := &trigger.Config{}
 	err := json.Unmarshal([]byte(testConfig), config)
@@ -40,10 +44,13 @@ func TestKafkaTrigger_Initialize(t *testing.T) {
 	actions := map[string]action.Action{"dummy": test.NewDummyAction(func() {
 		//do nothing
 	})}
-
+	wg.Add(1)
+ 
 	trg, err := test.InitTrigger(f, config, actions)
 	assert.Nil(t, err)
 	assert.NotNil(t, trg)
-
-	trg.Start()
+	
+	go trg.Start()
+	wg.Wait()
+	
 }

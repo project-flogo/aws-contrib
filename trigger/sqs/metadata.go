@@ -9,17 +9,16 @@ type Settings struct {
 }
 
 type HandlerSettings struct {
-	QueueURL		string	`md:"queueUrl"`
-	WaitTimeSeconds int64 	`md:"waitTime"`
+	QueueURL		string	`md:"queueUrl,required"`
 }
 
 type Output struct {
-	Data string `md:"data"`
+	Data []interface{} `md:"data"`
 }
 
 func (o *Output) ToMap() map[string]interface{} {
 	return map[string]interface{}{
-		"data":o.Data
+		"data":o.Data,
 	}
 }
 
@@ -27,22 +26,7 @@ func (o *Output) FromMap(values map[string]interface{}) error {
 
 	var err error
 
-	o.Data , err = coerce.ToString(values["data"])
+	o.Data , err = coerce.ToArray(values["data"])
 	
 	return err
 }
-/*
-func (r *Reply) ToMap() map[string]interface{} {
-	return map[string]interface{}{
-	
-	}
-}
-
-func (r *Reply) FromMap(values map[string]interface{}) error {
-
-	var err error
-	
-
-	return nil
-}
-*/

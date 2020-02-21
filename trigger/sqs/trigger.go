@@ -7,9 +7,11 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/project-flogo/core/data/coerce"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/project-flogo/core/data/metadata"
 	"github.com/project-flogo/core/trigger"
+	"github.com/project-flogo/core/support/log"
 )
 
 var triggerMd = trigger.NewMetadata(&HandlerSettings{})
@@ -20,6 +22,8 @@ func init() {
 
 type Factory struct {
 }
+
+var logger log.Logger
 
 func (t *Factory) New(config *trigger.Config) (trigger.Trigger, error) {
 	s := &Settings{}
@@ -64,6 +68,8 @@ type Handler struct {
 
 func (t *Trigger) Initialize(ctx trigger.InitContext) error {
 	
+	logger = ctx.Logger()
+	
 	for _, handler := range ctx.GetHandlers() {
 		sqsInput := &sqs.ReceiveMessageInput{}
 		s := &HandlerSettings{}
@@ -72,8 +78,7 @@ func (t *Trigger) Initialize(ctx trigger.InitContext) error {
 		if err != nil {
 			return err
 		}
-		
-		t.handlers = append(t.handlers, Handler{sqsInput : sqsInput.SetQueueUrl(s.QueueURL),handler: handler})
+		t.handlers = append(t.handlers, Handler{sqsInput : sqsInput.SetQueueUrl(s.QueueURL).SetWaitTimeSeconds(20),handler: handler})
 	
 	}
 
@@ -83,16 +88,28 @@ func (t *Trigger) Initialize(ctx trigger.InitContext) error {
 
 func (h *Handler) subscribe(sqs *sqs.SQS) {
 	
-	output := &Output{}
-	out, err := sqs.ReceiveMessage(h.sqsInput)
+	for {
+		output := &Output{}
+		out, err := sqs.ReceiveMessage(h.sqsInput)
 
-	output.Data = out.String()
+		if err != nil {
+			logger.Debugf("Error while executing action %v", err.Error())
+		}
 
-	_, err = h.handler.Handle(context.Background(), out)
+		output.Data, _ = coerce.ToArray(out.Messages)
 
-	if err != nil{
-		logger.Debugf("Error while executing action %v", err.Error())
-	}
+		logger.Debugf("Data from trigger %v", output)
+
+		if len(output.Data) != 0 { // No Data in queue in last 20 seconds.
+			_, err = h.handler.Handle(context.Background(), output)
+
+			if err != nil{
+				logger.Debugf("Error while executing action %v", err.Error())
+			}
+		}
+	
+	}	
+	
 	
 }
 
