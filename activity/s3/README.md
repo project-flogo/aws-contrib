@@ -1,8 +1,6 @@
 # Amazon S3
 
-Upload or Download files from Amazon Simple Storage Service (S3). The Key Id and Secret Access Key needs to be set as Enviornment variable.
-
-
+Upload or Download files from Amazon Simple Storage Service (S3). 
 
 ## Installation
 
