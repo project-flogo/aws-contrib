@@ -15,7 +15,6 @@
                 "delete",
                 "copy"
             ],
-            "required": "true",
             "description": "The action you want to perform"
         },
         {
@@ -55,7 +54,6 @@
                 "delete",
                 "copy"
             ],
-            "required": "true",
             "description": "The action you want to perform"
         },
         {

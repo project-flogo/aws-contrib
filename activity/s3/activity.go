@@ -48,7 +48,7 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 			return nil, err
 		}
 		act.awsSession = session.Must(session.NewSession(&aws.Config{
-			Region:      aws.String(region),
+			Region: aws.String(region),
 		}))
 	} else {
 		act.awsSession = session.Must(session.NewSession(&aws.Config{}))
@@ -69,10 +69,9 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 	}
 
 	logger = ctx.Logger()
-	var action string
-	if a.settings.Action != "" {
-		action = a.settings.Action
-	} else {
+	action := a.settings.Action
+
+	if in.Action != "" {
 		action = in.Action
 	}
 
