@@ -1,18 +1,18 @@
 package s3
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
-	"errors"
-	
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/project-flogo/core/activity"
 	"github.com/project-flogo/core/data/metadata"
 	"github.com/project-flogo/core/support/log"
@@ -49,7 +49,7 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 			return nil, err
 		}
 		act.awsSession = session.Must(session.NewSession(&aws.Config{
-			Region: aws.String(region),
+			Region:      aws.String(region),
 			Credentials: credentials.NewEnvCredentials(),
 		}))
 	} else {
@@ -71,9 +71,15 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 	}
 
 	logger = ctx.Logger()
+	var action string
+	if a.settings.Action != "" {
+		action = a.settings.Action
+	} else {
+		action = in.Action
+	}
 
 	var s3err error
-	switch in.Action {
+	switch action {
 	case "download":
 		s3err = downloadFileFromS3(a.awsSession, in.LocalLocation, in.S3Location, in.S3BucketName)
 	case "upload":
@@ -83,7 +89,7 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 	case "copy":
 		s3err = copyFileOnS3(a.awsSession, in.S3Location, in.S3BucketName, in.S3NewLocation)
 	case "":
-		s3err = errors.New("Action not specified.")	
+		s3err = errors.New("Action not specified.")
 	}
 	if s3err != nil {
 		// Set the output value in the context

@@ -5,15 +5,16 @@ import (
 )
 
 type Settings struct {
-	AWSRegion          string `md:"awsRegion"`
+	AWSRegion string `md:"awsRegion"`
+	Action    string `md:"action"`
 }
 
 type Input struct {
-	Action             string `md:"action"`
-	S3BucketName       string `md:"s3BucketName"`
-	S3Location         string `md:"s3Location"`
-	LocalLocation      string `md:"localLocation"`
-	S3NewLocation      string `md:"s3NewLocation"`
+	Action        string `md:"action"`
+	S3BucketName  string `md:"s3BucketName"`
+	S3Location    string `md:"s3Location"`
+	LocalLocation string `md:"localLocation"`
+	S3NewLocation string `md:"s3NewLocation"`
 }
 
 type Output struct {
@@ -22,11 +23,11 @@ type Output struct {
 
 func (i *Input) ToMap() map[string]interface{} {
 	return map[string]interface{}{
-		"action":             i.Action,
-		"s3BucketName":       i.S3BucketName,
-		"s3Location":         i.S3Location,
-		"localLocation":      i.LocalLocation,
-		"s3NewLocation":      i.S3NewLocation,
+		"action":        i.Action,
+		"s3BucketName":  i.S3BucketName,
+		"s3Location":    i.S3Location,
+		"localLocation": i.LocalLocation,
+		"s3NewLocation": i.S3NewLocation,
 	}
 }
 

@@ -7,16 +7,16 @@
     "homepage": "https://github.com/project-flogo/aws-contrib/tree/master/activity/s3",
     "settings": [
         {
-            "name": "awsAccessKeyID",
+            "name": "action",
             "type": "string",
-            "required": "false",
-            "description": "Your AWS Access Key (only needed if you don't give your Lambda function rights to invoke S3 reads and puts)"
-        },
-        {
-            "name": "awsSecretAccessKey",
-            "type": "string",
-            "required": "false",
-            "description": "Your AWS Secret Key (only needed if you don't give your Lambda function rights to invoke S3 reads and puts)"
+            "allowed": [
+                "download",
+                "upload",
+                "delete",
+                "copy"
+            ],
+            "required": "true",
+            "description": "The action you want to perform"
         },
         {
             "name": "awsRegion",
