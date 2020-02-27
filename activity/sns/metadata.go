@@ -32,7 +32,7 @@ func (i *Input) FromMap(values map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	i.Message, err =values["message"]
+	i.Message = values["message"]
 	return err
 }
 

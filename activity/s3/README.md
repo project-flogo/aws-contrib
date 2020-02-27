@@ -1,7 +1,6 @@
 # Amazon S3
 
-Upload or Download files from Amazon Simple Storage Service (S3)
-
+Upload or Download files from Amazon Simple Storage Service (S3). 
 
 ## Installation
 
@@ -14,6 +13,8 @@ Link for flogo web:
 ```bash
 https://github.comproject-flogo/aws-contrib/activity/s3
 ```
+## Configuration
+To configure AWS credentials see [configuring-sdk](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html)
 
 ## Settings
 

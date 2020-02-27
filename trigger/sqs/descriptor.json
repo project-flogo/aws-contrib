@@ -1,0 +1,30 @@
+{
+	"name": "sqs-trigger",
+	"type": "flogo:trigger",
+	"version": "0.0.1",
+	"title": "FLOGO AWS_SQS Trigger",
+	"description": "A trigger that can read data from AWS SQS",
+	"settings": [
+		{
+			"name": "region",
+			"type": "string",
+			"required": false
+		}
+	],
+	"output": [
+		{
+			"name": "data",
+			"type": "any",
+			"required": false
+		}
+	],
+	"handler": {
+		"settings": [
+			{
+				"name": "queueUrl",
+				"type": "string",
+				"required": false
+			}
+		]
+	}
+}

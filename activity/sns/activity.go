@@ -6,10 +6,12 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/project-flogo/core/activity"
 	"github.com/project-flogo/core/data/coerce"
 	"github.com/project-flogo/core/data/metadata"
+	"github.com/project-flogo/core/support/log"
 )
 
 func init() {
@@ -19,7 +21,7 @@ func init() {
 const (
 	ovMessageId = "messageId"
 )
-
+var logger log.Logger
 // Activity is an activity that is used to invoke a lambda function
 type Activity struct {
 	settings *Settings
@@ -73,6 +75,8 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 		return false, err
 	}
 
+	logger = ctx.Logger()
+
 	pInput := &sns.PublishInput{TopicArn: &a.settings.TopicARN}
 
 	var msg string
@@ -120,6 +124,11 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 
 	pOutput, err := a.client.Publish(pInput)
 	if err != nil {
+		if reqerr, ok := err.(awserr.RequestFailure); ok {
+			logger.Debug("Request failed", reqerr.Code(), reqerr.Message(), reqerr.RequestID())
+		} else {
+			logger.Debug("Error:", err.Error())
+		}
 		return false, err
 	}
 
