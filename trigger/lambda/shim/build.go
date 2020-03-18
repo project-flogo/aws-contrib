@@ -60,6 +60,10 @@ func main() {
 	if err := compressExe(outputZip, inputExe); err != nil {
 		fmt.Printf("Failed to compress file: %v", err)
 	}
+	err = CopyFile(outputZip, filepath.Join(cmd.Dir, "..", "bin", "handler.zip"))
+	if err != nil {
+		fmt.Println("Failed to copy zip file to bin: %v", err)
+	}
 }
 
 func writeExe(writer *zip.Writer, pathInZip string, data []byte) error {
@@ -93,4 +97,18 @@ func compressExe(outZipPath, exePath string) error {
 	}
 
 	return writeExe(zipWriter, filepath.Base(exePath), data)
+}
+
+func CopyFile(srcFile, destFile string) error {
+	input, err := ioutil.ReadFile(srcFile)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(destFile, input, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
