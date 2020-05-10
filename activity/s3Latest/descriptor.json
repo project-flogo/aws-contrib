@@ -1,0 +1,46 @@
+{
+  "name": "sample-activity",
+  "type": "flogo:activity",
+  "version": "0.0.1",
+  "title": "Sample Activity",
+  "description": "Sample Activity",
+  "homepage": "https://github.com/project-flogo/tree/master/examples/activity",
+  "settings": [
+    {
+      "name": "driverName",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "psqlInfo",
+      "type": "string",
+      "required": true
+    }
+  ],
+  "input": [
+    {
+      "name": "ind",
+      "type": "integer",
+      "required": true
+    },
+    {
+      "name": "act",
+      "type": "integer",
+      "required": true
+    },    {
+      "name": "pred",
+      "type": "array",
+      "required": true
+    },    {
+      "name": "t",
+      "type": "integer",
+      "required": true
+    }
+  ],
+  "output": [
+    {
+      "name": "Output",
+      "type": "string"
+    }
+  ]
+}

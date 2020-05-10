@@ -11,6 +11,7 @@ A collection of AWS related Flogo contributions.  This repository consists of ac
 * [lambda](activity/lambda): Invoke Lambda function
 * [sms](activity/sms): Send SMS message via SNS
 * [sns](activity/sns): Send message via SNS
+* [s3Latest](activity/s3Latest): Check s3 for a newer version of a local file
 
 ### Triggers
 * [lambda](trigger/lambda): Trigger to run Flogo as AWS Lambda function
