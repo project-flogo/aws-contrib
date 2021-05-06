@@ -39,6 +39,20 @@ func main() {
 		fmt.Printf(err.Error())
 	}
 
+	// Install missing indirect modules
+	fmt.Println("Install modules")
+	cmd = exec.Command("go", "get")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	cmd.Dir = filepath.Join(appDir)
+	cmd.Env = append(os.Environ(), "GOOS=linux")
+
+	err = cmd.Run()
+	if err != nil {
+		fmt.Printf(err.Error())
+	}
+
 	// Build an executable for Linux
 	fmt.Println("Building a new handler file")
 	cmd = exec.Command("go", "build", "-o", "handler")
